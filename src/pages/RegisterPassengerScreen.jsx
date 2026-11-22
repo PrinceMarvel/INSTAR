@@ -1,10 +1,11 @@
 /**
  * Écran d'Inscription Passager de l'application INSTAR.
- * Intègre la sélection d'indicatif international avec drapeaux pour tous les voyageurs.
+ * Intègre la sélection d'indicatif international avec drapeaux et traduction dynamique.
  */
 
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import PhoneInput from '../components/ui/PhoneInput';
@@ -13,6 +14,7 @@ import { User, Lock, ArrowLeft, AlertCircle } from 'lucide-react';
 
 export default function RegisterPassengerScreen({ onNavigate }) {
   const { registerPassenger } = useAuth();
+  const { t } = useLanguage();
 
   const [fullName, setFullName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -26,12 +28,12 @@ export default function RegisterPassengerScreen({ onNavigate }) {
     setErrorMessage('');
 
     if (password !== confirmPassword) {
-      setErrorMessage('Les mots de passe ne correspondent pas.');
+      setErrorMessage(t('passwordMismatch'));
       return;
     }
 
     if (password.length < 6) {
-      setErrorMessage('Le mot de passe doit comporter au moins 6 caractères.');
+      setErrorMessage(t('passwordTooShort'));
       return;
     }
 
@@ -65,14 +67,14 @@ export default function RegisterPassengerScreen({ onNavigate }) {
           className="inline-flex items-center gap-1.5 text-xs font-bold text-instar-text hover:text-instar-text-muted"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Retour à la connexion</span>
+          <span>{t('backToLogin')}</span>
         </button>
       </div>
 
       <div className="text-center mb-5">
-        <h1 className="text-xl font-black text-instar-text tracking-tight">Compte Passager</h1>
+        <h1 className="text-xl font-black text-instar-text tracking-tight">{t('passengerRegisterTitle')}</h1>
         <p className="text-xs text-instar-text-muted mt-1">
-          Commandez vos motos-taxis et taxis à Gagnoa en toute sérénité
+          {t('passengerRegisterSubtitle')}
         </p>
       </div>
 
@@ -86,7 +88,7 @@ export default function RegisterPassengerScreen({ onNavigate }) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Nom complet"
+            label={t('fullNameLabel')}
             placeholder="Ex : Koffi Kouassi Ange"
             icon={User}
             value={fullName}
@@ -95,17 +97,16 @@ export default function RegisterPassengerScreen({ onNavigate }) {
           />
 
           <PhoneInput
-            label="Numéro de téléphone mobile"
+            label={t('phoneLabel')}
             value={phoneNumber}
             onChange={setPhoneNumber}
-            helperText="Accessible aux numéros ivoiriens et internationaux."
             required
           />
 
           <Input
-            label="Mot de passe"
+            label={t('passwordLabel')}
             type="password"
-            placeholder="Minimum 6 caractères"
+            placeholder="••••••••"
             icon={Lock}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -113,9 +114,9 @@ export default function RegisterPassengerScreen({ onNavigate }) {
           />
 
           <Input
-            label="Confirmer le mot de passe"
+            label={t('confirmPasswordLabel')}
             type="password"
-            placeholder="Confirmez votre mot de passe"
+            placeholder="••••••••"
             icon={Lock}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
@@ -130,19 +131,19 @@ export default function RegisterPassengerScreen({ onNavigate }) {
             isLoading={isLoading}
             className="mt-2"
           >
-            Créer mon compte
+            {t('createAccountButton')}
           </Button>
         </form>
 
         <div className="pt-4 mt-4 border-t border-instar-border text-center text-xs text-instar-text-muted">
           <p>
-            Vous avez déjà un compte ?{' '}
+            {t('alreadyAccount')}{' '}
             <button
               type="button"
               onClick={() => onNavigate && onNavigate('login')}
               className="font-bold text-instar-text hover:underline"
             >
-              Se connecter
+              {t('loginTitle')}
             </button>
           </p>
         </div>

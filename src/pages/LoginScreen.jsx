@@ -1,10 +1,11 @@
 /**
  * Écran de Connexion unifié de l'application INSTAR.
- * Bascule instantanée entre Passager, Chauffeur et Administrateur.
+ * Bascule instantanée entre Passager, Chauffeur et Administrateur avec internationalisation réactive.
  */
 
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import PhoneInput from '../components/ui/PhoneInput';
@@ -13,6 +14,7 @@ import { Eye, EyeOff, ShieldCheck, Car, User, Lock, Mail, AlertCircle } from 'lu
 
 export default function LoginScreen({ onNavigate }) {
   const { loginMobile, loginAdmin } = useAuth();
+  const { t } = useLanguage();
 
   const [activeRole, setActiveRole] = useState('PASSENGER'); // 'PASSENGER' | 'DRIVER' | 'ADMIN'
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -58,10 +60,8 @@ export default function LoginScreen({ onNavigate }) {
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-instar-secondary shadow-instar-action mb-3">
           <span className="text-2xl font-black text-instar-text tracking-wider">IN</span>
         </div>
-        <h1 className="text-2xl font-black text-instar-text tracking-tight">INSTAR</h1>
-        <p className="text-xs text-instar-text-muted mt-1 font-medium">
-          L’Ange de la route, rapide et sécurisée à Gagnoa
-        </p>
+        <h1 className="text-2xl font-black text-instar-text tracking-tight">{t('appName')}</h1>
+        <p className="text-xs text-instar-text-muted mt-1 font-medium">{t('slogan')}</p>
       </div>
 
       <Card className="w-full">
@@ -77,7 +77,7 @@ export default function LoginScreen({ onNavigate }) {
             }`}
           >
             <User className="w-3.5 h-3.5" />
-            <span>Passager</span>
+            <span>{t('passenger')}</span>
           </button>
 
           <button
@@ -90,7 +90,7 @@ export default function LoginScreen({ onNavigate }) {
             }`}
           >
             <Car className="w-3.5 h-3.5" />
-            <span>Chauffeur</span>
+            <span>{t('driver')}</span>
           </button>
 
           <button
@@ -103,7 +103,7 @@ export default function LoginScreen({ onNavigate }) {
             }`}
           >
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Admin</span>
+            <span>{t('admin')}</span>
           </button>
         </div>
 
@@ -119,7 +119,7 @@ export default function LoginScreen({ onNavigate }) {
         <form onSubmit={handleSubmit} className="space-y-4">
           {activeRole === 'ADMIN' ? (
             <Input
-              label="Adresse e-mail administrateur"
+              label={t('adminEmailLabel')}
               type="email"
               placeholder="admin@instar.ci"
               icon={Mail}
@@ -129,7 +129,7 @@ export default function LoginScreen({ onNavigate }) {
             />
           ) : (
             <PhoneInput
-              label="Numéro de téléphone"
+              label={t('phoneLabel')}
               value={phoneNumber}
               onChange={setPhoneNumber}
               required
@@ -138,7 +138,7 @@ export default function LoginScreen({ onNavigate }) {
 
           <div className="relative">
             <Input
-              label="Mot de passe"
+              label={t('passwordLabel')}
               type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               icon={Lock}
@@ -164,7 +164,7 @@ export default function LoginScreen({ onNavigate }) {
             isLoading={isLoading}
             className="mt-2"
           >
-            Se connecter
+            {t('loginButton')}
           </Button>
         </form>
 
@@ -173,24 +173,24 @@ export default function LoginScreen({ onNavigate }) {
           <div className="pt-4 mt-4 border-t border-instar-border text-center text-xs text-instar-text-muted">
             {activeRole === 'PASSENGER' ? (
               <p>
-                Nouveau sur INSTAR ?{' '}
+                {t('noAccountPassenger')}{' '}
                 <button
                   type="button"
                   onClick={() => onNavigate && onNavigate('register_passenger')}
                   className="font-bold text-instar-text hover:underline"
                 >
-                  Créer un compte passager
+                  {t('createPassengerAccount')}
                 </button>
               </p>
             ) : (
               <p>
-                Vous possédez une moto ou un taxi ?{' '}
+                {t('noAccountDriver')}{' '}
                 <button
                   type="button"
                   onClick={() => onNavigate && onNavigate('register_driver')}
                   className="font-bold text-instar-text hover:underline"
                 >
-                  Rejoindre la flotte INSTAR
+                  {t('joinDriverFleet')}
                 </button>
               </p>
             )}

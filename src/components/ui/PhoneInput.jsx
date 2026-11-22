@@ -1,10 +1,11 @@
 /**
  * Composant de saisie de numéro de téléphone international pour INSTAR.
- * Permet la sélection de l'indicatif avec affichage du drapeau national (défaut : Côte d'Ivoire).
+ * Intègre la sélection de l'indicatif avec drapeaux et déclenche l'adaptation automatique de la langue.
  */
 
 import React, { useState, useMemo } from 'react';
 import { ChevronDown, Search, X } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const COUNTRY_CODES = [
   { code: 'CI', name: 'Côte d’Ivoire', dialCode: '+225', flag: '🇨🇮', placeholder: '07 08 09 10 11' },
@@ -27,7 +28,7 @@ export const COUNTRY_CODES = [
 ];
 
 export default function PhoneInput({
-  label = 'Numéro de téléphone',
+  label,
   value = '',
   onChange,
   error,
@@ -36,11 +37,14 @@ export default function PhoneInput({
   required = true,
   className = '',
 }) {
+  const { t, setLanguageByCountry } = useLanguage();
   const [selectedCountry, setSelectedCountry] = useState(COUNTRY_CODES[0]); // Défaut Côte d'Ivoire
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Extraction du numéro local (sans l'indicatif) pour l'affichage dans le champ texte
+  const displayLabel = label || t('phoneLabel');
+
+  // Extraction du numéro local (sans l'indicatif)
   const localNumber = useMemo(() => {
     if (!value) return '';
     if (value.startsWith(selectedCountry.dialCode)) {
@@ -50,7 +54,6 @@ export default function PhoneInput({
   }, [value, selectedCountry.dialCode]);
 
   const handleNumberChange = (e) => {
-    // Conservation uniquement des chiffres saisis
     const rawDigits = e.target.value.replace(/[^0-9]/g, '');
     const fullNumber = rawDigits ? `${selectedCountry.dialCode}${rawDigits}` : '';
     if (onChange) {
@@ -62,6 +65,10 @@ export default function PhoneInput({
     setSelectedCountry(country);
     setIsModalOpen(false);
     setSearchQuery('');
+
+    // Adaptation instantanée de la langue de toute l'application au pays choisi !
+    setLanguageByCountry(country.code);
+
     if (localNumber && onChange) {
       onChange(`${country.dialCode}${localNumber}`);
     }
@@ -77,13 +84,13 @@ export default function PhoneInput({
 
   return (
     <div className={`w-full flex flex-col gap-1.5 text-left ${className}`}>
-      {label && (
+      {displayLabel && (
         <label className="text-xs font-semibold text-instar-text tracking-wide flex items-center justify-between">
           <span>
-            {label}
+            {displayLabel}
             {required && <span className="text-instar-danger ml-1">*</span>}
           </span>
-          <span className="text-[11px] font-normal text-instar-text-muted">International</span>
+          <span className="text-[11px] font-normal text-instar-text-muted">{t('international')}</span>
         </label>
       )}
 
@@ -133,7 +140,7 @@ export default function PhoneInput({
 
           <div className="relative z-10 w-full max-w-sm bg-instar-surface rounded-t-3xl sm:rounded-2xl p-5 shadow-2xl border border-instar-border max-h-[80vh] flex flex-col">
             <div className="flex items-center justify-between pb-3 border-b border-instar-border mb-3">
-              <h3 className="font-bold text-instar-text text-base">Sélectionnez votre pays</h3>
+              <h3 className="font-bold text-instar-text text-base">{t('selectCountryTitle')}</h3>
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
@@ -143,20 +150,18 @@ export default function PhoneInput({
               </button>
             </div>
 
-            {/* Champ de recherche */}
             <div className="relative mb-3">
               <Search className="w-4 h-4 absolute left-3 top-3 text-instar-text-muted" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Rechercher un pays ou un indicatif..."
+                placeholder={t('searchCountryPlaceholder')}
                 className="w-full bg-instar-surface-alt text-instar-text text-sm rounded-xl pl-9 pr-3 py-2.5 outline-none border border-instar-border focus:border-instar-border-active"
                 autoFocus
               />
             </div>
 
-            {/* Liste des pays */}
             <div className="overflow-y-auto space-y-1 pr-1 flex-1">
               {filteredCountries.map((country) => (
                 <button
@@ -177,7 +182,7 @@ export default function PhoneInput({
                 </button>
               ))}
               {filteredCountries.length === 0 && (
-                <p className="text-xs text-center text-instar-text-muted py-6">Aucun pays trouvé.</p>
+                <p className="text-xs text-center text-instar-text-muted py-6">{t('noCountryFound')}</p>
               )}
             </div>
           </div>
