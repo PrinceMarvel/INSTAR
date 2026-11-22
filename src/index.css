@@ -1,0 +1,48 @@
+/**
+ * Feuille de style principale de l'application INSTAR.
+ * Intègre les directives Tailwind CSS et neutralise les artefacts tactiles sur mobile.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Normalisation du comportement tactile sur mobile (anti-flash, anti-zoom) */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply min-h-screen font-sans;
+    overscroll-behavior-y: contain;
+  }
+
+  /* Normalisation du focus pour l'accessibilité */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-instar-secondary;
+  }
+
+  /* Conteneur d'application mobile plein écran */
+  #root {
+    @apply min-h-screen flex flex-col;
+  }
+}
+
+@layer components {
+  /* Utilitaire de conteneur d'écran mobile centré */
+  .instar-screen {
+    @apply flex flex-col min-h-screen w-full max-w-md mx-auto px-4 py-6;
+  }
+
+  /* Utilitaire pour les en-têtes de page */
+  .instar-header {
+    @apply flex items-center justify-between mb-6;
+  }
+}
