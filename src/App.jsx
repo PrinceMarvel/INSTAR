@@ -8,7 +8,8 @@ import { LanguageProvider } from './context/LanguageContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
 
-// Écrans d'authentification
+// Écrans publics & onboarding
+import WelcomeScreen from './pages/WelcomeScreen';
 import LoginScreen from './pages/LoginScreen';
 import RegisterPassengerScreen from './pages/RegisterPassengerScreen';
 import RegisterDriverScreen from './pages/RegisterDriverScreen';
@@ -32,8 +33,8 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 function MainRouter() {
   const { isAuthenticated, role, isLoading } = useAuth();
 
-  // Écran courant et paramètres de navigation
-  const [currentScreen, setCurrentScreen] = useState('login');
+  // Écran courant : 'welcome' par défaut pour les nouveaux visiteurs (style app mobile)
+  const [currentScreen, setCurrentScreen] = useState('welcome');
   const [navigationParams, setNavigationParams] = useState({});
 
   // Redirection automatique dès que la session est restaurée ou connectée
@@ -47,9 +48,9 @@ function MainRouter() {
         setCurrentScreen('home');
       }
     } else if (!isLoading && !isAuthenticated) {
-      // Si déconnecté et sur un écran protégé, retour à la connexion
-      if (!['login', 'register_passenger', 'register_driver'].includes(currentScreen)) {
-        setCurrentScreen('login');
+      // Si déconnecté et sur un écran protégé, retour à l'écran d'accueil
+      if (!['welcome', 'login', 'register_passenger', 'register_driver'].includes(currentScreen)) {
+        setCurrentScreen('welcome');
       }
     }
   }, [isAuthenticated, role, isLoading]);
@@ -60,7 +61,11 @@ function MainRouter() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // 1. Écrans d'authentification publics
+  // 1. Écrans publics (Non authentifiés)
+  if (currentScreen === 'welcome') {
+    return <WelcomeScreen onNavigate={handleNavigate} />;
+  }
+
   if (currentScreen === 'register_passenger') {
     return <RegisterPassengerScreen onNavigate={handleNavigate} />;
   }
@@ -69,8 +74,12 @@ function MainRouter() {
     return <RegisterDriverScreen onNavigate={handleNavigate} />;
   }
 
-  if (!isAuthenticated || currentScreen === 'login') {
+  if (currentScreen === 'login') {
     return <LoginScreen onNavigate={handleNavigate} />;
+  }
+
+  if (!isAuthenticated) {
+    return <WelcomeScreen onNavigate={handleNavigate} />;
   }
 
   // 2. Écrans Passagers (Protégés)
@@ -133,7 +142,7 @@ function MainRouter() {
   }
 
   // Écran de repli par défaut
-  return <LoginScreen onNavigate={handleNavigate} />;
+  return <WelcomeScreen onNavigate={handleNavigate} />;
 }
 
 export default function App() {

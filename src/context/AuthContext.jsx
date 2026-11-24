@@ -44,16 +44,17 @@ export function AuthProvider({ children }) {
 
   // Sauvegarde centralisée de la session dans le stockage local et l'état React
   const saveSession = useCallback((sessionData) => {
-    const { token: newToken, account, user: userData, admin, role: newRole } = sessionData;
-    const profileData = account || userData || admin;
+    const { token: newToken, account, user: userData, admin, driver: driverData, role: newRole } = sessionData;
+    const profileData = account || userData || admin || driverData;
+    const determinedRole = newRole || profileData?.role || 'PASSENGER';
 
     setToken(newToken);
     setUser(profileData);
-    setRole(newRole);
+    setRole(determinedRole);
 
     localStorage.setItem(STORAGE_KEYS.TOKEN, newToken);
     localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(profileData));
-    localStorage.setItem(STORAGE_KEYS.ROLE, newRole);
+    localStorage.setItem(STORAGE_KEYS.ROLE, determinedRole);
   }, []);
 
   // Inscription d'un passager
