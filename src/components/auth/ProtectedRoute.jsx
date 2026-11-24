@@ -13,7 +13,7 @@ export default function ProtectedRoute({
   fallback = null,
   onRedirectToLogin,
 }) {
-  const { isAuthenticated, role, isLoading } = useAuth();
+  const { isAuthenticated, role, isLoading, logout } = useAuth();
 
   if (isLoading) {
     return (
@@ -40,14 +40,30 @@ export default function ProtectedRoute({
   // Vérification des privilèges par rôle
   if (allowedRoles.length > 0 && !allowedRoles.includes(role)) {
     return (
-      <div className="instar-screen justify-center text-center py-10">
-        <div className="w-16 h-16 rounded-full bg-red-100 text-instar-danger mx-auto flex items-center justify-center text-2xl font-bold mb-4">
+      <div className="instar-screen justify-center text-center py-10 px-4">
+        <div className="w-16 h-16 rounded-full bg-red-100 text-instar-danger mx-auto flex items-center justify-center text-2xl font-bold mb-4 shadow-sm">
           !
         </div>
         <h2 className="text-lg font-bold text-instar-text">Accès restreint</h2>
         <p className="text-xs text-instar-text-muted mt-2 max-w-xs mx-auto">
           Vous ne disposez pas des privilèges nécessaires pour afficher cet espace de travail.
         </p>
+        <div className="mt-6 flex flex-col gap-2 max-w-xs mx-auto w-full">
+          <button
+            type="button"
+            onClick={() => {
+              logout();
+              if (onRedirectToLogin) {
+                onRedirectToLogin();
+              } else {
+                window.location.reload();
+              }
+            }}
+            className="w-full py-3 px-4 rounded-xl bg-instar-secondary text-instar-text font-bold text-xs shadow-instar-action hover:opacity-95 transition-opacity"
+          >
+            Se déconnecter & Réinitialiser
+          </button>
+        </div>
       </div>
     );
   }

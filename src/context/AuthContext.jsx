@@ -20,7 +20,7 @@ export function AuthProvider({ children }) {
   const [role, setRole] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Restauration de la session persistée au chargement initial
+  // Restauration de la session persistée au chargement initial avec auto-guérison
   useEffect(() => {
     try {
       const storedToken = localStorage.getItem(STORAGE_KEYS.TOKEN);
@@ -28,9 +28,22 @@ export function AuthProvider({ children }) {
       const storedRole = localStorage.getItem(STORAGE_KEYS.ROLE);
 
       if (storedToken && storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        // Auto-guérison si le rôle est manquant, null ou stocké sous la chaîne "undefined"
+        const validRole =
+          storedRole && storedRole !== 'undefined' && storedRole !== 'null'
+            ? storedRole
+            : parsedUser?.role || 'PASSENGER';
+
         setToken(storedToken);
-        setUser(JSON.parse(storedUser));
-        setRole(storedRole);
+        setUser(parsedUser);
+        setRole(validRole);
+        localStorage.setItem(STORAGE_KEYS.ROLE, validRole);
+      } else {
+        // Nettoyage préventif si les données de session sont incomplètes
+        localStorage.removeItem(STORAGE_KEYS.TOKEN);
+        localStorage.removeItem(STORAGE_KEYS.USER);
+        localStorage.removeItem(STORAGE_KEYS.ROLE);
       }
     } catch (err) {
       // Nettoyage en cas de données corrompues dans le stockage local
