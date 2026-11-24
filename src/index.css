@@ -41,6 +41,11 @@
     @apply flex flex-col min-h-screen w-full max-w-md mx-auto px-4 py-6;
   }
 
+  /* Utilitaire de conteneur plein écran pour interface dispatch moderne (style Yango) */
+  .instar-screen-full {
+    @apply flex flex-col min-h-screen w-full;
+  }
+
   /* Utilitaire pour les en-têtes de page */
   .instar-header {
     @apply flex items-center justify-between mb-6;
